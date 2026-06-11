@@ -1,0 +1,3751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comité Villas de Pachuquilla 5 - Control de Pagos</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-midnight: #0b0f19;
+            --surface-glass: rgba(17, 25, 40, 0.75);
+            --surface-card: #151d30;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.35);
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.2);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.2);
+            
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.2);
+            
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-midnight);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo i {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo h1 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+
+        /* Live Sync Indicator badge */
+        .sync-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
+        }
+
+        .sync-dot.live {
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        .sync-dot.offline {
+            background: var(--warning);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.35rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-glass);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero / KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .kpi-card.kpi-balance::before { background: var(--success); }
+        .kpi-card.kpi-gastos::before { background: var(--danger); }
+        .kpi-card.kpi-houses::before { background: var(--warning); }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-header i {
+            font-size: 1.1rem;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .kpi-sub i {
+            color: var(--success);
+        }
+
+        /* Charts Section */
+        .summary-dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .summary-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dashboard-box {
+            background: var(--surface-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .box-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .box-title span {
+            font-size: 0.8rem;
+            font-family: var(--font-main);
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Villa Grid Map - House Style */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem 0.5rem 2.25rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .villas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* Villa Card as a House Shape */
+        .villa-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 1.25rem 1rem 1rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* A little roof indicator using CSS border on top */
+        .villa-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--text-muted);
+            border-radius: 12px 12px 0 0;
+            transition: var(--transition);
+        }
+
+        .villa-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .villa-card.status-occupied::after {
+            background: var(--primary);
+        }
+
+        .villa-card.status-empty::after {
+            background: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .villa-card.status-obranegra::after {
+            background: var(--warning);
+        }
+
+        .house-icon-container {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .villa-card:hover .house-icon-container {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .villa-id {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .villa-owner {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Paid months text styling */
+        .villa-months-text {
+            font-size: 0.7rem;
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            background: rgba(16, 185, 129, 0.08);
+            padding: 0.1rem 0.4rem;
+            border-radius: 6px;
+        }
+
+        /* Mini Contribution Heatmap Inside Each House Card */
+        .mini-history {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 100%;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 0.75rem;
+        }
+
+        .mini-year-row {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .mini-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mini-dot.paid {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .mini-dot.unpaid {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .mini-dot.no-apply {
+            visibility: hidden;
+        }
+
+        .villa-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+        }
+
+        .badge-occupied {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+        }
+        .badge-empty {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+        }
+        .badge-obranegra {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        /* Spreadsheet Matrix style */
+        .matrix-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            background: var(--surface-card);
+            max-height: 70vh;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.8rem;
+        }
+
+        .matrix-table th, .matrix-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-glass);
+            border-right: 1px solid var(--border-glass);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Fixed column for House ID */
+        .matrix-table th:first-child, .matrix-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: var(--surface-card);
+            font-family: var(--font-display);
+            font-weight: 700;
+            border-right: 2px solid var(--border-glass);
+            text-align: left;
+        }
+
+        .matrix-table th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 9;
+            font-size: 0.75rem;
+            border-bottom: 2px solid var(--border-glass);
+        }
+
+        .matrix-table th:first-child {
+            z-index: 11;
+        }
+
+        .matrix-cell-paid {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .matrix-cell-empty {
+            background: transparent;
+            color: var(--text-muted);
+            opacity: 0.45;
+        }
+
+        .matrix-cell-notapply {
+            background: rgba(255, 255, 255, 0.01);
+            color: var(--text-muted);
+            opacity: 0.15;
+        }
+
+        /* Table view normal */
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            background: var(--surface-card);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .td-house {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .td-amount {
+            font-family: var(--font-display);
+            font-weight: 600;
+        }
+
+        /* Expenses view */
+        .expenses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .expense-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .expense-item:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .expense-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .expense-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .expense-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .expense-amount {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--danger);
+            white-space: nowrap;
+        }
+
+        /* Modal / Side Panel */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: var(--surface-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: modalScale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-house-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-owner-name {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .modal-section-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 0.25rem;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Calendar grid */
+        .calendar-year-block {
+            margin-bottom: 1.25rem;
+        }
+
+        .calendar-year-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-months-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .calendar-months-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .calendar-cell {
+            border-radius: 6px;
+            padding: 0.5rem 0.25rem;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--border-glass);
+            position: relative;
+        }
+
+        .calendar-cell.paid {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .calendar-cell.unpaid {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: var(--border-glass);
+            color: var(--text-muted);
+        }
+
+        .calendar-cell.no-apply {
+            background: rgba(255, 255, 255, 0.01);
+            border-color: transparent;
+            color: var(--text-muted);
+            opacity: 0.25;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-house-laptop"></i>
+            <div class="logo-container">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <h1>Villas de Pachuquilla 5</h1>
+                    <span>Comité</span>
+                </div>
+                <div class="sync-badge" id="sync-status">
+                    <div class="sync-dot" id="sync-dot"></div>
+                    <span id="sync-text">Conectando...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('mapa', this)">
+                <i class="fa-solid fa-house"></i> Vista Casas
+            </button>
+            <button class="tab-btn" onclick="switchTab('matrix', this)">
+                <i class="fa-solid fa-table-cells"></i> Hoja de Cálculo
+            </button>
+            <button class="tab-btn" onclick="switchTab('control', this)">
+                <i class="fa-solid fa-list-check"></i> Tabla Resumen
+            </button>
+            <button class="tab-btn" onclick="switchTab('graficas', this)">
+                <i class="fa-solid fa-chart-pie"></i> Reportes Gráficos
+            </button>
+            <button class="tab-btn" onclick="switchTab('gastos', this)">
+                <i class="fa-solid fa-receipt"></i> Egresos
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Tab: Vista Casas -->
+        <div id="tab-mapa" class="tab-content active">
+            <!-- Summary Financial Cards at the top -->
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-balance">
+                    <div class="kpi-header">
+                        <span>Fondo Disponible (Balance)</span>
+                        <i class="fa-solid fa-wallet" style="color: var(--success);"></i>
+                    </div>
+                    <div class="kpi-value" id="kpi-balance-val">$0.00</div>
+                    <div class="kpi-sub">
+                        <i class="fa-solid fa-check-circle"></i> Cuenta activa y al día
+                    </div>
+                </div>
+                
+                <div class="kpi-card kpi-ingresos">
+                    <div class="kpi-header">
+                        <span>Ingresos Totales</span>
+                        <i class="fa-solid fa-circle-arrow-up" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="kpi-value" id="kpi-inputs-val">$0.00</div>
+                    <div class="kpi-sub" id="kpi-transfer-info">
+                        Cargando información...
+                    </div>
+                </div>
+                
+                <div class="kpi-card kpi-gastos">
+                    <div class="kpi-header">
+                        <span>Egresos Totales</span>
+                        <i class="fa-solid fa-circle-arrow-down" style="color: var(--danger);"></i>
+                    </div>
+                    <div class="kpi-value" id="kpi-egresos-val">$0.00</div>
+                    <div class="kpi-sub">
+                        <i class="fa-solid fa-tags"></i> 16 compras o servicios pagados
+                    </div>
+                </div>
+                
+                <div class="kpi-card kpi-houses">
+                    <div class="kpi-header">
+                        <span>Villas Habitadas</span>
+                        <i class="fa-solid fa-users" style="color: var(--warning);"></i>
+                    </div>
+                    <div class="kpi-value" id="kpi-houses-val">0 / 32</div>
+                    <div class="kpi-sub">
+                        <i class="fa-solid fa-home"></i> 3 desocupadas / obra negra
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters & Houses Grid -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <button class="filter-btn active" onclick="filterVillas('all', this)">Todas</button>
+                    <button class="filter-btn" onclick="filterVillas('Habitada', this)">Habitadas</button>
+                    <button class="filter-btn" onclick="filterVillas('Desocupada', this)">Desocupadas</button>
+                    <button class="filter-btn" onclick="filterVillas('En Obra Negra', this)">Obra Negra</button>
+                </div>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="mapa-search" placeholder="Buscar por casa o nombre..." oninput="searchVillas(this.value)">
+                </div>
+            </div>
+            
+            <div class="villas-grid" id="villas-grid-container">
+                <!-- Javascript builds villa cards -->
+            </div>
+        </div>
+
+        <!-- Tab: Hoja de Cálculo (Matrix View) -->
+        <div id="tab-matrix" class="tab-content">
+            <div class="filter-bar" style="border-top: none; padding-top: 0;">
+                <div class="filter-group">
+                    <span style="font-size: 0.9rem; color: var(--text-secondary); align-self: center;">
+                        Historial completo de aportaciones en vista de hoja de cálculo (horizontal)
+                    </span>
+                </div>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="matrix-search" placeholder="Filtrar fila..." oninput="searchMatrix(this.value)">
+                </div>
+            </div>
+            
+            <div class="matrix-container">
+                <table class="matrix-table">
+                    <thead id="matrix-head">
+                        <!-- Javascript builds year and month headers -->
+                    </thead>
+                    <tbody id="matrix-body">
+                        <!-- Javascript builds matrix rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Tabla Resumen -->
+        <div id="tab-control" class="tab-content">
+            <div class="filter-bar" style="border-top: none; padding-top: 0;">
+                <div class="filter-group">
+                    <span style="font-size: 0.9rem; color: var(--text-secondary); align-self: center;">
+                        Resumen general y aportación del portón eléctrico
+                    </span>
+                </div>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="table-search" placeholder="Buscar en la tabla..." oninput="searchTable(this.value)">
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Villa</th>
+                            <th>Residente</th>
+                            <th>Estatus</th>
+                            <th>Portón Eléctrico</th>
+                            <th>Controles</th>
+                            <th>Meses Registrados</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Javascript builds rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Reportes Gráficos -->
+        <div id="tab-graficas" class="tab-content">
+            <div class="summary-dashboard">
+                <div class="dashboard-box">
+                    <div class="box-title">
+                        Balance General
+                        <span>Ingresos vs Gastos Mensuales</span>
+                    </div>
+                    <div style="position: relative; height: 320px; width: 100%;">
+                        <canvas id="balanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="dashboard-box">
+                    <div class="box-title">
+                        Aportación de Portón
+                        <span>Cuota de $1,400</span>
+                    </div>
+                    <div style="position: relative; height: 200px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="portonChart"></canvas>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        <p id="porton-stats-text">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Egresos -->
+        <div id="tab-gastos" class="tab-content">
+            <div class="dashboard-box" style="margin-bottom: 2rem;">
+                <div class="box-title">
+                    Historial Completo de Egresos
+                    <span>Comité Villas de Pachuquilla 5</span>
+                </div>
+                <div class="expenses-list" id="expenses-list-container">
+                    <!-- Javascript builds expenses list -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal for House Details -->
+    <div class="modal-overlay" id="villa-modal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-header">
+                <div class="modal-house-title" id="modal-title">CASA 00</div>
+                <div class="modal-owner-name" id="modal-owner">Nombre de Propietario</div>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Portón Eléctrico</div>
+                    <div class="stat-value" id="modal-porton-status" style="font-size: 0.95rem;">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Controles</div>
+                    <div class="stat-value" id="modal-controls-num">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Meses Pagados</div>
+                    <div class="stat-value" id="modal-months-paid" style="color: var(--success); font-size: 1.15rem;">0</div>
+                </div>
+            </div>
+            
+            <div class="modal-section-title">Calendario Completo de Aportaciones ($100/mes)</div>
+            <div id="modal-calendar-container">
+                <!-- Javascript builds calendars per year -->
+            </div>
+            
+            <div style="display: flex; gap: 1rem; font-size: 0.7rem; color: var(--text-secondary); margin-top: 1.5rem; justify-content: center;">
+                <span style="display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-square" style="color: rgba(16, 185, 129, 0.25);"></i> Pagado ($100)</span>
+                <span style="display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-square" style="color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1);"></i> Pendiente / No Registrado</span>
+                <span style="display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-square" style="color: rgba(255, 255, 255, 0.01);"></i> N/A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Injection -->
+    <script>
+        // Fallback local data (if offline)
+        let COMITE_DATA = {
+  "balance": "$16,601.00",
+  "inputs": "$67,700.00",
+  "gastos": "$51,099.00",
+  "transfer_from_previous": "",
+  "months": [
+    {
+      "col_idx": 5,
+      "name": "MAYO",
+      "year": "2023"
+    },
+    {
+      "col_idx": 6,
+      "name": "JUNIO",
+      "year": "2023"
+    },
+    {
+      "col_idx": 7,
+      "name": "JULIO",
+      "year": "2023"
+    },
+    {
+      "col_idx": 8,
+      "name": "AGOSTO",
+      "year": "2023"
+    },
+    {
+      "col_idx": 9,
+      "name": "SEPTIEMBRE",
+      "year": "2023"
+    },
+    {
+      "col_idx": 10,
+      "name": "OCTUBRE",
+      "year": "2023"
+    },
+    {
+      "col_idx": 11,
+      "name": "NOVIEMBRE",
+      "year": "2023"
+    },
+    {
+      "col_idx": 12,
+      "name": "DICIEMBRE",
+      "year": "2023"
+    },
+    {
+      "col_idx": 13,
+      "name": "ENERO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 14,
+      "name": "FEBRERO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 15,
+      "name": "MARZO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 16,
+      "name": "ABRIL",
+      "year": "2024"
+    },
+    {
+      "col_idx": 17,
+      "name": "MAYO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 18,
+      "name": "JUNIO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 19,
+      "name": "JULIO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 20,
+      "name": "AGOSTO",
+      "year": "2024"
+    },
+    {
+      "col_idx": 21,
+      "name": "SEPTIEMBRE",
+      "year": "2024"
+    },
+    {
+      "col_idx": 22,
+      "name": "OCTUBRE",
+      "year": "2024"
+    },
+    {
+      "col_idx": 23,
+      "name": "NOVIEMBRE",
+      "year": "2024"
+    },
+    {
+      "col_idx": 24,
+      "name": "DICIEMBRE",
+      "year": "2024"
+    },
+    {
+      "col_idx": 25,
+      "name": "ENERO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 26,
+      "name": "FEBRERO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 27,
+      "name": "MARZO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 28,
+      "name": "ABRIL",
+      "year": "2025"
+    },
+    {
+      "col_idx": 29,
+      "name": "MAYO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 30,
+      "name": "JUNIO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 31,
+      "name": "JULIO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 32,
+      "name": "AGOSTO",
+      "year": "2025"
+    },
+    {
+      "col_idx": 33,
+      "name": "SEPTIMBRE",
+      "year": "2025"
+    },
+    {
+      "col_idx": 34,
+      "name": "OCTUBRE",
+      "year": "2025"
+    },
+    {
+      "col_idx": 35,
+      "name": "NOVIEMBRE",
+      "year": "2025"
+    },
+    {
+      "col_idx": 36,
+      "name": "DICIEMBRE",
+      "year": "2025"
+    },
+    {
+      "col_idx": 37,
+      "name": "ENERO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 38,
+      "name": "FEBRERO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 39,
+      "name": "MARZO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 40,
+      "name": "ABRIL",
+      "year": "2026"
+    },
+    {
+      "col_idx": 41,
+      "name": "MAYO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 42,
+      "name": "JUNIO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 43,
+      "name": "JULIO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 44,
+      "name": "AGOSTO",
+      "year": "2026"
+    },
+    {
+      "col_idx": 45,
+      "name": "SEPTIEMBRE",
+      "year": "2026"
+    },
+    {
+      "col_idx": 46,
+      "name": "OCTUBRE",
+      "year": "2026"
+    },
+    {
+      "col_idx": 47,
+      "name": "NOVIEMBRE",
+      "year": "2026"
+    },
+    {
+      "col_idx": 48,
+      "name": "DICIEMBRE",
+      "year": "2026"
+    }
+  ],
+  "houses": [
+    {
+      "id": "CASA 01",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "MACEDONIO",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 02",
+      "status": "Habitada",
+      "controls": "3",
+      "resident": "ARTURO HERNANDEZ GARCÍA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 03",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "DANIEL ALEJANDRO CASTAÑEDA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 04",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "EDITH CAMACHO TORRES",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "$100.00",
+        "JULIO_2026": "$100.00",
+        "AGOSTO_2026": "$100.00",
+        "SEPTIEMBRE_2026": "$100.00",
+        "OCTUBRE_2026": "$100.00",
+        "NOVIEMBRE_2026": "$100.00",
+        "DICIEMBRE_2026": "$100.00"
+      }
+    },
+    {
+      "id": "CASA 05",
+      "status": "Desocupada",
+      "controls": "",
+      "resident": "",
+      "gate_coop": "$0.00",
+      "payments": {
+        "MAYO_2023": "",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 06",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "JOSE ANTONIO ALDANA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 07",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "ADAN PACHECO ORTEGA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 08",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "JORGE ABURTO GASTELUM",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 09",
+      "status": "Desocupada",
+      "controls": "",
+      "resident": "",
+      "gate_coop": "$0.00",
+      "payments": {
+        "MAYO_2023": "",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 10",
+      "status": "Habitada",
+      "controls": "1",
+      "resident": "ARTURO CASTILLO ESTRADA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 11",
+      "status": "Habitada",
+      "controls": "1",
+      "resident": "ELIZABETH TABOADA RAZO",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "$100.00",
+        "JULIO_2026": "$100.00",
+        "AGOSTO_2026": "$100.00",
+        "SEPTIEMBRE_2026": "$100.00",
+        "OCTUBRE_2026": "$100.00",
+        "NOVIEMBRE_2026": "$100.00",
+        "DICIEMBRE_2026": "$100.00"
+      }
+    },
+    {
+      "id": "CASA 12",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "JOSHELIN CRUZ ESCARTIN",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "$100.00",
+        "JULIO_2026": "$100.00",
+        "AGOSTO_2026": "$100.00",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 13",
+      "status": "Habitada",
+      "controls": "1",
+      "resident": "CECILIA PINEDA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 14",
+      "status": "Habitada",
+      "controls": "1",
+      "resident": "MONICA LUNA FDEZ.",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 15",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "ARACELI MUÑOZ GARNICA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 16",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "DIANA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 17",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "DAVID OTHON GONZALEZ",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 18",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "EDUARDO GARCIA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 19",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "KARINA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 20",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "FERNANDO",
+      "gate_coop": "$0.00",
+      "payments": {
+        "MAYO_2023": "",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 21",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "MIGUEL ANGEL PABLO",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 22",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "ANA KAREN GUERRA HDEZ",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "$100.00",
+        "JULIO_2026": "$100.00",
+        "AGOSTO_2026": "$100.00",
+        "SEPTIEMBRE_2026": "$100.00",
+        "OCTUBRE_2026": "$100.00",
+        "NOVIEMBRE_2026": "$100.00",
+        "DICIEMBRE_2026": "$100.00"
+      }
+    },
+    {
+      "id": "CASA 23",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "ARTURO CARDENAS",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 24",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "MIGUEL ANGEL",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 25",
+      "status": "En Obra Negra",
+      "controls": "",
+      "resident": "",
+      "gate_coop": "$0.00",
+      "payments": {
+        "MAYO_2023": "",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 26",
+      "status": "Habitada",
+      "controls": "3",
+      "resident": "CARO",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 27",
+      "status": "Habitada",
+      "controls": "1",
+      "resident": "FELIPE LÓPEZ SALAZAR",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "$100.00",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 28",
+      "status": "Habitada",
+      "controls": "",
+      "resident": "CASA 28",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 29",
+      "status": "Habitada",
+      "controls": "1",
+      "resident": "JORGE FERNANDEZ VELAZQUEZ",
+      "gate_coop": "$0.00",
+      "payments": {
+        "MAYO_2023": "$0.00",
+        "JUNIO_2023": "",
+        "JULIO_2023": "",
+        "AGOSTO_2023": "",
+        "SEPTIEMBRE_2023": "",
+        "OCTUBRE_2023": "",
+        "NOVIEMBRE_2023": "",
+        "DICIEMBRE_2023": "",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 30",
+      "status": "Habitada",
+      "controls": "3",
+      "resident": "JAQUELINE ARMENTA FLORES",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "",
+        "FEBRERO_2024": "",
+        "MARZO_2024": "",
+        "ABRIL_2024": "",
+        "MAYO_2024": "",
+        "JUNIO_2024": "",
+        "JULIO_2024": "",
+        "AGOSTO_2024": "",
+        "SEPTIEMBRE_2024": "",
+        "OCTUBRE_2024": "",
+        "NOVIEMBRE_2024": "",
+        "DICIEMBRE_2024": "",
+        "ENERO_2025": "",
+        "FEBRERO_2025": "",
+        "MARZO_2025": "",
+        "ABRIL_2025": "",
+        "MAYO_2025": "",
+        "JUNIO_2025": "",
+        "JULIO_2025": "",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "",
+        "ENERO_2026": "",
+        "FEBRERO_2026": "",
+        "MARZO_2026": "",
+        "ABRIL_2026": "",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 31",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "FRANCISCO",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "$100.00",
+        "SEPTIMBRE_2025": "$100.00",
+        "OCTUBRE_2025": "$100.00",
+        "NOVIEMBRE_2025": "$100.00",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "",
+        "JUNIO_2026": "",
+        "JULIO_2026": "",
+        "AGOSTO_2026": "",
+        "SEPTIEMBRE_2026": "",
+        "OCTUBRE_2026": "",
+        "NOVIEMBRE_2026": "",
+        "DICIEMBRE_2026": ""
+      }
+    },
+    {
+      "id": "CASA 32",
+      "status": "Habitada",
+      "controls": "2",
+      "resident": "ARMANDO GARCÍA",
+      "gate_coop": "$1,400.00",
+      "payments": {
+        "MAYO_2023": "$100.00",
+        "JUNIO_2023": "$100.00",
+        "JULIO_2023": "$100.00",
+        "AGOSTO_2023": "$100.00",
+        "SEPTIEMBRE_2023": "$100.00",
+        "OCTUBRE_2023": "$100.00",
+        "NOVIEMBRE_2023": "$100.00",
+        "DICIEMBRE_2023": "$100.00",
+        "ENERO_2024": "$100.00",
+        "FEBRERO_2024": "$100.00",
+        "MARZO_2024": "$100.00",
+        "ABRIL_2024": "$100.00",
+        "MAYO_2024": "$100.00",
+        "JUNIO_2024": "$100.00",
+        "JULIO_2024": "$100.00",
+        "AGOSTO_2024": "$100.00",
+        "SEPTIEMBRE_2024": "$100.00",
+        "OCTUBRE_2024": "$100.00",
+        "NOVIEMBRE_2024": "$100.00",
+        "DICIEMBRE_2024": "$100.00",
+        "ENERO_2025": "$100.00",
+        "FEBRERO_2025": "$100.00",
+        "MARZO_2025": "$100.00",
+        "ABRIL_2025": "$100.00",
+        "MAYO_2025": "$100.00",
+        "JUNIO_2025": "$100.00",
+        "JULIO_2025": "$100.00",
+        "AGOSTO_2025": "",
+        "SEPTIMBRE_2025": "",
+        "OCTUBRE_2025": "",
+        "NOVIEMBRE_2025": "",
+        "DICIEMBRE_2025": "$100.00",
+        "ENERO_2026": "$100.00",
+        "FEBRERO_2026": "$100.00",
+        "MARZO_2026": "$100.00",
+        "ABRIL_2026": "$100.00",
+        "MAYO_2026": "$100.00",
+        "JUNIO_2026": "$100.00",
+        "JULIO_2026": "$100.00",
+        "AGOSTO_2026": "$100.00",
+        "SEPTIEMBRE_2026": "$100.00",
+        "OCTUBRE_2026": "$100.00",
+        "NOVIEMBRE_2026": "$100.00",
+        "DICIEMBRE_2026": "$100.00"
+      }
+    }
+  ],
+  "expenses": [
+    {
+      "month": "SEPTIMBRE",
+      "year": "2025",
+      "amount": "corte de pasto",
+      "description": "$3,300.00"
+    },
+    {
+      "month": "DICIEMBRE",
+      "year": "2025",
+      "amount": "Reparación de Porton soldadura 600 + cambio de tarjeta 1200",
+      "description": "$1,800.00"
+    },
+    {
+      "month": "MARZO",
+      "year": "2026",
+      "amount": "Revisión y Cotización de PORTON (Se incluye si se contrata)",
+      "description": "$500.00"
+    },
+    {
+      "month": "MAYO",
+      "year": "2026",
+      "amount": "Compra de motor, transferenciala vecino David 27 de mayo Banamex",
+      "description": "$10,099.00"
+    },
+    {
+      "month": "JUNIO",
+      "year": "2026",
+      "amount": "Pago de corte de pasto Jardinero Macedonio",
+      "description": "$1,400.00"
+    }
+  ]
+};
+        
+        let balanceChartInstance = null;
+        let portonChartInstance = null;
+
+        // Google Sheet JSONP URL (bypasses CORS in local file:// browser environment)
+        const SHEET_JSONP_URL = "https://docs.google.com/spreadsheets/d/1sN4CdRS55hwOFjYKb8XHQWeebyYunkvMNf0HYG9K7bY/gviz/tq?tqx=responseHandler:handleGoogleData&gid=0";
+
+        // Helper to convert Google Sheets JSON response to a 2D Array
+        function convertGvizTo2DArray(gvizData) {
+            const rows = [];
+            if (!gvizData || !gvizData.table || !gvizData.table.rows) {
+                throw new Error("Formato de respuesta de Google Sheets inválido");
+            }
+            gvizData.table.rows.forEach(r => {
+                const row = [];
+                if (r.c) {
+                    r.c.forEach(cell => {
+                        if (cell === null) {
+                            row.push("");
+                        } else {
+                            const val = cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== null && cell.v !== undefined ? String(cell.v) : "");
+                            row.push(val);
+                        }
+                    });
+                }
+                rows.push(row);
+            });
+            return rows;
+        }
+
+        // Structured data builder from raw 2D array
+        function processRawRows(rows) {
+            // Locate the "Comite" row dynamically to handle any shifts
+            let comiteRowIdx = -1;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].length > 1 && rows[i][1] && rows[i][1].trim() === "Comite") {
+                    comiteRowIdx = i;
+                    break;
+                }
+            }
+            
+            if (comiteRowIdx === -1) {
+                throw new Error("No se encontró la fila 'Comite' en los datos.");
+            }
+            
+            // 1. Parse Global Metrics from Row 0
+            const balance = rows[0].length > 3 ? rows[0][3].trim() : "";
+            const inputs = rows[0].length > 6 ? rows[0][6].trim() : "";
+            const gastos = rows[0].length > 8 ? rows[0][8].trim() : "";
+            
+            // 2. Parse Houses from rows starting with "CASA "
+            const houses = [];
+            rows.forEach(row => {
+                if (row.length > 0 && row[0] && row[0].trim().startsWith("CASA ")) {
+                    const house_id = row[0].trim();
+                    const status = row.length > 1 ? row[1].trim() : "";
+                    const controls = row.length > 2 ? row[2].trim() : "";
+                    const resident = row.length > 3 ? row[3].trim() : "";
+                    const gate_coop = row.length > 4 ? row[4].trim() : "";
+                    
+                    const payments = {};
+                    // Use static months structure from COMITE_DATA
+                    COMITE_DATA.months.forEach(m => {
+                        const val = m.col_idx < row.length ? row[m.col_idx].trim() : "";
+                        payments[`${m.name}_${m.year}`] = val;
+                    });
+                    
+                    houses.push({
+                        id: house_id,
+                        status: status,
+                        controls: controls,
+                        resident: resident,
+                        gate_coop: gate_coop,
+                        payments: payments
+                    });
+                }
+            });
+            
+            // 3. Parse Expenses
+            const expenses = [];
+            const headerRow = rows[comiteRowIdx];
+            const amountsRow = rows[comiteRowIdx + 1];
+            const descRow = rows[comiteRowIdx + 2];
+            
+            const transfer_desc = descRow.length > 1 ? descRow[1].trim() : "";
+            
+            COMITE_DATA.months.forEach(m => {
+                const col = m.col_idx;
+                const amount = col < amountsRow.length ? amountsRow[col].trim() : "";
+                if (!amount || amount === "$0.00" || amount === "0") return;
+                
+                // Get header description and row description
+                const headerDesc = col < headerRow.length ? headerRow[col].trim() : "";
+                const descVal = col < descRow.length ? descRow[col].trim() : "";
+                
+                let fullDesc = "";
+                if (headerDesc && headerDesc !== "INFORME DE GASTOS" && headerDesc !== "Comite") {
+                    fullDesc = headerDesc;
+                }
+                
+                const clean_amount = amount.replace("$", "").replace(",", "").trim();
+                if (descVal && descVal !== amount && descVal !== clean_amount) {
+                    if (fullDesc) {
+                        fullDesc += " | " + descVal;
+                    } else {
+                        fullDesc = descVal;
+                    }
+                }
+                
+                // Try to find historical detailed description in our local backup
+                const localExp = COMITE_DATA.expenses.find(e => e.month === m.name && e.year === m.year);
+                if (localExp && localExp.description) {
+                    const local_desc = localExp.description.trim();
+                    // If the parsed description is empty or is just a duplicate of the amount number
+                    if (!fullDesc || !isNaN(fullDesc.replace(".", "").trim())) {
+                        fullDesc = local_desc;
+                    }
+                }
+                
+                expenses.push({
+                    month: m.name,
+                    year: m.year,
+                    amount: amount,
+                    description: fullDesc || `${m.name} ${m.year}`
+                });
+            });
+            
+            return {
+                balance,
+                inputs,
+                gastos,
+                transfer_from_previous: transfer_desc || COMITE_DATA.transfer_from_previous,
+                months: COMITE_DATA.months,
+                houses,
+                expenses
+            };
+        }
+
+        // Fetch Live Data from Google Sheets using JSONP (bypasses CORS on local file:// files)
+        function fetchLiveData() {
+            const syncDot = document.getElementById('sync-dot');
+            const syncText = document.getElementById('sync-text');
+            
+            // Set 3-second timeout for fallback if internet is slow or Google is down
+            const timeoutId = setTimeout(() => {
+                handleLoadError("Tiempo de espera excedido");
+            }, 3000);
+            
+            // Global JSONP callback function
+            window.handleGoogleData = function(gvizData) {
+                clearTimeout(timeoutId);
+                try {
+                    const rawRows = convertGvizTo2DArray(gvizData);
+                    const freshData = processRawRows(rawRows);
+                    
+                    // Update global data
+                    COMITE_DATA = freshData;
+                    
+                    // Update sync status to live
+                    syncDot.className = "sync-dot live";
+                    syncText.innerText = "Datos sincronizados en tiempo real (Google Sheets)";
+                    
+                    // Redraw UI
+                    refreshUI();
+                } catch (error) {
+                    console.error("Error processing live Google Sheet data:", error);
+                    handleLoadError(error.message);
+                }
+            };
+            
+            function handleLoadError(reason) {
+                console.warn("Failed to fetch live sheet data (using offline fallback):", reason);
+                syncDot.className = "sync-dot offline";
+                syncText.innerText = "Mostrando datos guardados localmente (sin conexión)";
+                
+                // Draw UI using local fallback data
+                refreshUI();
+            }
+            
+            // Inject dynamic script tag to trigger JSONP call
+            const script = document.createElement('script');
+            script.src = SHEET_JSONP_URL;
+            script.onerror = () => {
+                clearTimeout(timeoutId);
+                handleLoadError("Error de red al cargar script");
+            };
+            document.head.appendChild(script);
+        }
+
+        function refreshUI() {
+            // KPI metrics updates
+            document.getElementById('kpi-balance-val').innerText = COMITE_DATA.balance;
+            document.getElementById('kpi-inputs-val').innerText = COMITE_DATA.inputs;
+            document.getElementById('kpi-egresos-val').innerText = COMITE_DATA.gastos;
+            document.getElementById('kpi-transfer-info').innerHTML = `<i class="fa-solid fa-circle-info"></i> $5,090 saldo inicial recib. comite anterior`;
+
+            let occupiedCount = 0;
+            let emptyCount = 0;
+            let portonPaidCount = 0;
+            
+            COMITE_DATA.houses.forEach(h => {
+                if (h.status === 'Habitada') occupiedCount++;
+                else emptyCount++;
+                
+                if (h.gate_coop && h.gate_coop.replace('$', '').replace(',', '').trim() > 0) {
+                    portonPaidCount++;
+                }
+            });
+            
+            document.getElementById('kpi-houses-val').innerText = `${occupiedCount} / 32`;
+            document.getElementById('porton-stats-text').innerText = `${portonPaidCount} de 32 casas han cubierto la cuota del portón`;
+
+            // Redraw views based on current tab
+            const activeTabBtn = document.querySelector('.tab-btn.active');
+            if (activeTabBtn) {
+                const activeTab = activeTabBtn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                if (activeTab === 'mapa') renderVillas('all');
+                else if (activeTab === 'matrix') renderMatrix();
+                else if (activeTab === 'control') renderTable();
+            } else {
+                renderVillas('all');
+            }
+            
+            renderExpenses();
+            updateCharts(portonPaidCount);
+        }
+
+        // Tab switching
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btn.classList.add('active');
+            
+            if (tabId === 'mapa') {
+                renderVillas('all');
+            } else if (tabId === 'matrix') {
+                renderMatrix();
+            } else if (tabId === 'control') {
+                renderTable();
+            }
+        }
+
+        // Render villa cards with mini dot maps
+        function renderVillas(filter = 'all') {
+            const container = document.getElementById('villas-grid-container');
+            container.innerHTML = '';
+            
+            COMITE_DATA.houses.forEach(h => {
+                // Filtering
+                if (filter !== 'all' && h.status !== filter) return;
+                
+                let statusClass = 'status-occupied';
+                let badgeClass = 'badge-occupied';
+                if (h.status === 'Desocupada') {
+                    statusClass = 'status-empty';
+                    badgeClass = 'badge-empty';
+                } else if (h.status === 'En Obra Negra') {
+                    statusClass = 'status-obranegra';
+                    badgeClass = 'badge-obranegra';
+                }
+                
+                const card = document.createElement('div');
+                card.className = `villa-card ${statusClass}`;
+                card.onclick = () => openModal(h);
+                
+                // Build mini calendar dots
+                let miniHistoryHtml = '<div class="mini-history">';
+                const years = ['2023', '2024', '2025', '2026'];
+                
+                years.forEach(year => {
+                    miniHistoryHtml += '<div class="mini-year-row">';
+                    
+                    // Add blanks for 2023 early months
+                    if (year === '2023') {
+                        for (let i = 0; i < 4; i++) {
+                            miniHistoryHtml += '<div class="mini-dot no-apply"></div>';
+                        }
+                    }
+                    
+                    const yearMonths = COMITE_DATA.months.filter(m => m.year === year);
+                    yearMonths.forEach(m => {
+                        const payment = h.payments[`${m.name}_${m.year}`] || '';
+                        const isPaid = payment && payment.includes('100');
+                        miniHistoryHtml += `<div class="mini-dot ${isPaid ? 'paid' : 'unpaid'}" title="${m.name} ${year}: ${payment || 'Sin pago'}"></div>`;
+                    });
+                    
+                    miniHistoryHtml += '</div>';
+                });
+                miniHistoryHtml += '</div>';
+                
+                const monthsCount = getPaidMonthsCount(h);
+                const monthsTextHtml = h.status === 'Habitada' 
+                    ? `<div class="villa-months-text">${monthsCount} meses pagados</div>` 
+                    : '';
+                
+                card.innerHTML = `
+                    <div class="house-icon-container">
+                        <i class="fa-solid fa-house-chimney"></i>
+                    </div>
+                    <div class="villa-id">${h.id}</div>
+                    <div class="villa-owner">${h.resident || '<em>Desocupada</em>'}</div>
+                    ${monthsTextHtml}
+                    <span class="villa-badge ${badgeClass}">${h.status}</span>
+                    ${h.status === 'Habitada' ? miniHistoryHtml : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Search villas
+        function searchVillas(query) {
+            const val = query.toLowerCase().trim();
+            const cards = document.querySelectorAll('#villas-grid-container .villa-card');
+            cards.forEach(c => {
+                const text = c.innerText.toLowerCase();
+                if (text.includes(val)) {
+                    c.style.display = 'flex';
+                } else {
+                    c.style.display = 'none';
+                }
+            });
+        }
+
+        // Render Spreadsheet-Style Matrix Tab
+        function renderMatrix() {
+            const head = document.getElementById('matrix-head');
+            const body = document.getElementById('matrix-body');
+            
+            head.innerHTML = '';
+            body.innerHTML = '';
+            
+            // Build headers (Year row & Month row)
+            const yearRow = document.createElement('tr');
+            const monthRow = document.createElement('tr');
+            
+            yearRow.innerHTML = '<th rowspan="2">Villa</th><th rowspan="2">Propietario / Residente</th><th rowspan="2">Estatus</th><th rowspan="2">Portón</th>';
+            
+            let currentYear = "";
+            let colSpan = 0;
+            
+            COMITE_DATA.months.forEach((m, idx) => {
+                if (m.year !== currentYear) {
+                    if (currentYear !== "") {
+                        yearRow.innerHTML += `<th colspan="${colSpan}">${currentYear}</th>`;
+                    }
+                    currentYear = m.year;
+                    colSpan = 1;
+                } else {
+                    colSpan++;
+                }
+                
+                monthRow.innerHTML += `<th>${m.name.substring(0,3)}</th>`;
+                
+                if (idx === COMITE_DATA.months.length - 1) {
+                    yearRow.innerHTML += `<th colspan="${colSpan}">${currentYear}</th>`;
+                }
+            });
+            
+            head.appendChild(yearRow);
+            head.appendChild(monthRow);
+            
+            // Build body rows
+            COMITE_DATA.houses.forEach(h => {
+                const row = document.createElement('tr');
+                let rowHtml = `<td>${h.id}</td><td>${h.resident || 'Desocupada'}</td><td>${h.status}</td><td>${h.gate_coop || '$0.00'}</td>`;
+                
+                COMITE_DATA.months.forEach(m => {
+                    const monthIdx = getMonthIndex(m.name);
+                    if (m.year === '2023' && monthIdx < 4) {
+                        rowHtml += `<td class="matrix-cell-notapply">-</td>`;
+                        return;
+                    }
+                    
+                    const payment = h.payments[`${m.name}_${m.year}`] || '';
+                    if (payment && payment.includes('100')) {
+                        rowHtml += `<td class="matrix-cell-paid">$100</td>`;
+                    } else {
+                        rowHtml += `<td class="matrix-cell-empty">-</td>`;
+                    }
+                });
+                
+                row.innerHTML = rowHtml;
+                body.appendChild(row);
+            });
+        }
+
+        function searchMatrix(query) {
+            const val = query.toLowerCase().trim();
+            const rows = document.querySelectorAll('#matrix-body tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                if (text.includes(val)) {
+                    r.style.display = '';
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+        }
+
+        // Render Table General Resumen
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            COMITE_DATA.houses.forEach(h => {
+                const monthsCount = getPaidMonthsCount(h);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="td-house">${h.id}</td>
+                    <td>${h.resident || '<em>N/A</em>'}</td>
+                    <td><span class="villa-badge" style="background: rgba(255,255,255,0.05); color: var(--text-primary);">${h.status}</span></td>
+                    <td class="td-amount">${h.gate_coop || '$0.00'}</td>
+                    <td style="text-align: center;">${h.controls || '0'}</td>
+                    <td style="text-align: center;">${monthsCount} meses</td>
+                    <td>
+                        <button class="filter-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick='openModal(${JSON.stringify(h)})'>
+                            <i class="fa-solid fa-eye"></i> Historial
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function searchTable(query) {
+            const val = query.toLowerCase().trim();
+            const rows = document.querySelectorAll('#table-body tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                if (text.includes(val)) {
+                    r.style.display = '';
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+        }
+
+        // Render Egresos
+        function renderExpenses() {
+            const container = document.getElementById('expenses-list-container');
+            container.innerHTML = '';
+            
+            COMITE_DATA.expenses.forEach(e => {
+                const item = document.createElement('div');
+                item.className = 'expense-item';
+                item.innerHTML = `
+                    <div class="expense-info">
+                        <div class="expense-title">${e.description}</div>
+                        <div class="expense-date">${e.month} ${e.year}</div>
+                    </div>
+                    <div class="expense-amount">${e.amount}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function getPaidMonthsCount(house) {
+            let count = 0;
+            COMITE_DATA.months.forEach(m => {
+                const payment = house.payments[`${m.name}_${m.year}`] || '';
+                if (payment && payment.includes('100')) {
+                    count++;
+                }
+            });
+            return count;
+        }
+
+        function getMonthIndex(monthName) {
+            const monthsList = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE', 'SEPTIMBRE'];
+            let idx = monthsList.indexOf(monthName.toUpperCase().trim());
+            if (idx === 12) idx = 8;
+            return idx;
+        }
+
+        // Modal Handlers
+        function openModal(house) {
+            document.getElementById('modal-title').innerText = house.id;
+            document.getElementById('modal-owner').innerText = house.resident || 'Casa Desocupada / En Obra Negra';
+            
+            document.getElementById('modal-porton-status').innerHTML = house.gate_coop && house.gate_coop.replace('$', '').trim() > '0' 
+                ? '<span style="color: var(--success); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Pagado</span>' 
+                : '<span style="color: var(--text-muted);"><i class="fa-solid fa-circle-xmark"></i> Pendiente</span>';
+                
+            document.getElementById('modal-controls-num').innerText = house.controls || '0';
+            
+            const monthsCount = getPaidMonthsCount(house);
+            document.getElementById('modal-months-paid').innerText = `${monthsCount} meses`;
+
+            // Render calendar grid in modal
+            const calendarContainer = document.getElementById('modal-calendar-container');
+            calendarContainer.innerHTML = '';
+            
+            const years = ['2023', '2024', '2025', '2026'];
+            
+            years.forEach(year => {
+                const yearMonths = COMITE_DATA.months.filter(m => m.year === year);
+                if (yearMonths.length === 0) return;
+                
+                const block = document.createElement('div');
+                block.className = 'calendar-year-block';
+                block.innerHTML = `<div class="calendar-year-title">${year}</div>`;
+                
+                const grid = document.createElement('div');
+                grid.className = 'calendar-months-grid';
+                
+                if (year === '2023') {
+                    for(let i=0; i<4; i++) {
+                        grid.innerHTML += `<div class="calendar-cell no-apply">N/A</div>`;
+                    }
+                }
+                
+                yearMonths.forEach(m => {
+                    const payment = house.payments[`${m.name}_${m.year}`] || '';
+                    let cellClass = 'unpaid';
+                    
+                    if (payment && payment.includes('100')) {
+                        cellClass = 'paid';
+                    }
+                    
+                    if (house.status !== 'Habitada') {
+                        cellClass = 'no-apply';
+                    }
+                    
+                    const cell = document.createElement('div');
+                    cell.className = `calendar-cell ${cellClass}`;
+                    cell.innerText = m.name.substring(0,3);
+                    grid.appendChild(cell);
+                });
+                
+                block.appendChild(grid);
+                calendarContainer.appendChild(block);
+            });
+
+            document.getElementById('villa-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('villa-modal').style.display = 'none';
+        }
+
+        document.getElementById('villa-modal').onclick = (e) => {
+            if (e.target.id === 'villa-modal') closeModal();
+        };
+
+        // Charts update function
+        function updateCharts(portonPaidCount) {
+            const labels = [];
+            const incomesData = [];
+            const expensesData = [];
+
+            COMITE_DATA.months.forEach(m => {
+                labels.push(`${m.name.substring(0,3)} '${m.year.substring(2)}`);
+                
+                let monthIncome = 0;
+                COMITE_DATA.houses.forEach(h => {
+                    const pay = h.payments[`${m.name}_${m.year}`] || '';
+                    if (pay) {
+                        const val = parseFloat(pay.replace('$', '').replace(',', '').trim());
+                        if (!isNaN(val)) monthIncome += val;
+                    }
+                });
+                
+                let monthExpense = 0;
+                const exp = COMITE_DATA.expenses.find(e => e.month === m.name && e.year === m.year);
+                if (exp) {
+                    monthExpense = parseFloat(exp.amount.replace('$', '').replace(',', '').trim());
+                }
+                
+                incomesData.push(monthIncome);
+                expensesData.push(monthExpense);
+            });
+
+            // Destroy old charts if exist
+            if (balanceChartInstance) balanceChartInstance.destroy();
+            if (portonChartInstance) portonChartInstance.destroy();
+
+            // Create new charts
+            const ctxBalance = document.getElementById('balanceChart').getContext('2d');
+            balanceChartInstance = new Chart(ctxBalance, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Ingresos Mensuales ($)',
+                            data: incomesData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.65)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Egresos Mensuales ($)',
+                            data: expensesData,
+                            backgroundColor: 'rgba(239, 68, 68, 0.65)',
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans', size: 9 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f3f4f6', font: { family: 'Plus Jakarta Sans', weight: '500' } } }
+                    }
+                }
+            });
+
+            const ctxPorton = document.getElementById('portonChart').getContext('2d');
+            portonChartInstance = new Chart(ctxPorton, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aportado ($1,400)', 'Pendiente'],
+                    datasets: [{
+                        data: [portonPaidCount, 32 - portonPaidCount],
+                        backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(255, 255, 255, 0.05)'],
+                        borderColor: ['#10b981', 'rgba(255, 255, 255, 0.1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '75%'
+                }
+            });
+        }
+
+        // Run fetch on load
+        window.onload = () => {
+            fetchLiveData();
+        };
+    </script>
+</body>
+</html>
