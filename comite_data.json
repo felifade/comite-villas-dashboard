@@ -1,6 +1,6 @@
 {
-  "balance": "$16,601.00",
-  "inputs": "$67,700.00",
+  "balance": "$16,501.00",
+  "inputs": "$67,600.00",
   "gastos": "$51,099.00",
   "transfer_from_previous": "",
   "months": [
@@ -1648,7 +1648,7 @@
         "MARZO_2026": "$100.00",
         "ABRIL_2026": "$100.00",
         "MAYO_2026": "$100.00",
-        "JUNIO_2026": "$100.00",
+        "JUNIO_2026": "",
         "JULIO_2026": "",
         "AGOSTO_2026": "",
         "SEPTIEMBRE_2026": "",
@@ -1925,34 +1925,94 @@
   ],
   "expenses": [
     {
+      "month": "MAYO",
+      "year": "2023",
+      "amount": "$550.00",
+      "description": "Poda de áreas comunes 20/05/2023"
+    },
+    {
+      "month": "JUNIO",
+      "year": "2023",
+      "amount": "$11,000.00",
+      "description": "01 - 02 - 24 Entrega de adelanto para el porton corredizo Vecina Karina"
+    },
+    {
+      "month": "JULIO",
+      "year": "2023",
+      "amount": "$12,700.00",
+      "description": "10 - 02 - 24 Pago final pago por pintura adelanto de pinturaDiscos para cortar el metal sobrante"
+    },
+    {
+      "month": "SEPTIEMBRE",
+      "year": "2023",
+      "amount": "$1,100.00",
+      "description": "pagado mano de obra y 100 mas por lijas, 22 de febrero"
+    },
+    {
+      "month": "OCTUBRE",
+      "year": "2023",
+      "amount": "$250.00",
+      "description": "Engrasante para porton"
+    },
+    {
+      "month": "NOVIEMBRE",
+      "year": "2023",
+      "amount": "$100.00",
+      "description": "Basura jardines septiembre 2024"
+    },
+    {
+      "month": "DICIEMBRE",
+      "year": "2023",
+      "amount": "$1,000.00",
+      "description": "Mtto. Prevento 14 de marzo e 2025"
+    },
+    {
+      "month": "ENERO",
+      "year": "2024",
+      "amount": "$4,700.00",
+      "description": "29 marzo adelanto para camaras"
+    },
+    {
+      "month": "FEBRERO",
+      "year": "2024",
+      "amount": "$1,300.00",
+      "description": "Corte del pasto por parte de la vecina casa 19 karina"
+    },
+    {
+      "month": "MARZO",
+      "year": "2024",
+      "amount": "$1,300.00",
+      "description": "Recogida del pasto que se corto"
+    },
+    {
       "month": "SEPTIMBRE",
       "year": "2025",
-      "amount": "corte de pasto",
-      "description": "$3,300.00"
+      "amount": "$3,300.00",
+      "description": "corte de pasto"
     },
     {
       "month": "DICIEMBRE",
       "year": "2025",
-      "amount": "Reparación de Porton soldadura 600 + cambio de tarjeta 1200",
-      "description": "$1,800.00"
+      "amount": "$1,800.00",
+      "description": "Reparación de Porton soldadura 600 + cambio de tarjeta 1200"
     },
     {
       "month": "MARZO",
       "year": "2026",
-      "amount": "Revisión y Cotización de PORTON (Se incluye si se contrata)",
-      "description": "$500.00"
+      "amount": "$500.00",
+      "description": "Revisión y Cotización de PORTON (Se incluye si se contrata)"
     },
     {
       "month": "MAYO",
       "year": "2026",
-      "amount": "Compra de motor, transferenciala vecino David 27 de mayo Banamex",
-      "description": "$10,099.00"
+      "amount": "$10,099.00",
+      "description": "Compra de motor, transferenciala vecino David 27 de mayo Banamex"
     },
     {
       "month": "JUNIO",
       "year": "2026",
-      "amount": "Pago de corte de pasto Jardinero Macedonio",
-      "description": "$1,400.00"
+      "amount": "$1,400.00",
+      "description": "Pago de corte de pasto Jardinero Macedonio"
     }
   ]
 }

@@ -80,13 +80,8 @@ try:
         })
 
     # 4. Extraer gastos detallados
-    amounts_row = rows[38]
     category_row = rows[37]
-    desc_short_row = rows[39] if len(rows) > 39 else []
-    desc_long_row = rows[40] if len(rows) > 40 else []
-    desc_extra_row = rows[41] if len(rows) > 41 else []
-
-    transfer_desc = desc_short_row[1].strip() if len(desc_short_row) > 1 else ""
+    transfer_desc = rows[39][1].strip() if len(rows) > 39 and len(rows[39]) > 1 else ""
 
     # Cargar base de datos local anterior para buscar descripciones históricas detalladas
     local_json_path = os.path.join(os.path.dirname(__file__), "comite_data.json")
@@ -99,10 +94,40 @@ try:
         except:
             pass
 
+    def is_numeric_match(val1, val2):
+        try:
+            v1 = float(val1.replace("$", "").replace(",", "").strip())
+            v2 = float(val2.replace("$", "").replace(",", "").strip())
+            return v1 == v2
+        except:
+            return False
+
     expenses = []
     for m in months:
         col = m["col_idx"]
-        amount = amounts_row[col].strip() if col < len(amounts_row) else ""
+        
+        val_38 = rows[38][col].strip() if col < len(rows[38]) else ""
+        val_39 = rows[39][col].strip() if col < len(rows[39]) else ""
+        
+        # Identificar cuál es el monto y cuál es la descripción en las filas 38 y 39
+        amount = ""
+        concept_direct = ""
+        
+        if "$" in val_38:
+            amount = val_38
+            concept_direct = val_39
+        elif "$" in val_39:
+            amount = val_39
+            concept_direct = val_38
+        elif val_38 and not val_39:
+            amount = val_38
+        elif val_39 and not val_38:
+            amount = val_39
+        else:
+            amount = val_39
+            concept_direct = val_38
+            
+        # Si el monto está vacío, es cero o no es un gasto, ignorar
         if not amount or amount == "$0.00" or amount == "0":
             continue
             
@@ -112,22 +137,27 @@ try:
                 header_desc = category_row[h_col].strip()
                 break
                 
-        desc_short = desc_short_row[col].strip() if col < len(desc_short_row) else ""
-        desc_long = desc_long_row[col].strip() if col < len(desc_long_row) else ""
-        desc_extra = desc_extra_row[col].strip() if col < len(desc_extra_row) else ""
-
-        desc = []
+        # Construir lista de descripciones
+        desc_parts = []
         if header_desc:
-            desc.append(header_desc)
-        if desc_long:
-            desc.append(desc_long)
-        if desc_extra:
-            desc.append(desc_extra)
+            desc_parts.append(header_desc)
             
-        full_desc = " | ".join(desc) if desc else desc_short
-        if not full_desc:
-            if col == 5:
-                full_desc = desc_short_row[3].strip() if len(desc_short_row) > 3 else ""
+        # Añadir el concepto directo si no es numéricamente igual al monto
+        if concept_direct and not is_numeric_match(concept_direct, amount):
+            desc_parts.append(concept_direct)
+            
+        # Descripciones complementarias (fila index 40 en adelante)
+        for r_idx in range(40, len(rows)):
+            if col < len(rows[r_idx]):
+                detail = rows[r_idx][col].strip()
+                if detail and not is_numeric_match(detail, amount):
+                    desc_parts.append(detail)
+                    
+        full_desc = " | ".join(desc_parts) if desc_parts else ""
+        
+        # Fallback especial para el primer mes (Mayo 2023)
+        if not full_desc and col == 5:
+            full_desc = rows[40][3].strip() if len(rows) > 40 and len(rows[40]) > 3 else ""
 
         # Usar descripción detallada anterior si la actual está vacía o es solo un número
         if not full_desc or full_desc.replace("$", "").replace(",", "").replace(".", "").strip().isdigit():
@@ -135,6 +165,9 @@ try:
                 if le["month"] == m["name"] and le["year"] == m["year"] and le.get("description"):
                     full_desc = le["description"]
                     break
+
+        if not full_desc:
+            full_desc = "Gasto General"
 
         expenses.append({
             "month": m["name"],

@@ -18,6 +18,7 @@
             --bg-midnight: #0b0f19;
             --surface-glass: rgba(17, 25, 40, 0.75);
             --surface-card: #151d30;
+            --surface: #151d30;
             --border-glass: rgba(255, 255, 255, 0.08);
             
             --primary: #3b82f6;
@@ -42,6 +43,17 @@
             --font-display: 'Outfit', sans-serif;
             
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.light-mode {
+            --background: #f1f5f9;
+            --surface: #ffffff;
+            --surface-card: #ffffff;
+            --border-glass: rgba(0, 0, 0, 0.1);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --primary-glow: rgba(59, 130, 246, 0.15);
         }
 
         * {
@@ -392,16 +404,16 @@
 
         .villas-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.85rem;
         }
 
         /* Villa Card as a House Shape */
         .villa-card {
             background: var(--surface-card);
             border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 1.25rem 1rem 1rem 1rem;
+            border-radius: 10px;
+            padding: 0.75rem 0.5rem 0.5rem 0.5rem;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -444,8 +456,8 @@
         }
 
         .house-icon-container {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
             color: var(--text-secondary);
             transition: var(--transition);
         }
@@ -457,27 +469,27 @@
 
         .villa-id {
             font-family: var(--font-display);
-            font-size: 1.15rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.15rem;
         }
 
         .villa-owner {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
         }
 
         /* Paid months text styling */
         .villa-months-text {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--success);
             font-weight: 600;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.4rem;
             background: rgba(16, 185, 129, 0.08);
             padding: 0.1rem 0.4rem;
             border-radius: 6px;
@@ -491,7 +503,7 @@
             width: 100%;
             margin-top: auto;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
-            padding-top: 0.75rem;
+            padding-top: 0.4rem;
         }
 
         .mini-year-row {
@@ -548,7 +560,7 @@
         /* Spreadsheet Matrix style */
         .matrix-container {
             width: 100%;
-            overflow-x: auto;
+            overflow: auto; /* Permite scroll tanto horizontal como vertical */
             border: 1px solid var(--border-glass);
             border-radius: 12px;
             background: var(--surface-card);
@@ -556,45 +568,105 @@
         }
 
         .matrix-table {
-            width: 100%;
+            width: max-content; /* Previene que las columnas se colapsen */
+            min-width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             font-size: 0.8rem;
         }
 
         .matrix-table th, .matrix-table td {
-            padding: 0.5rem 0.75rem;
+            padding: 0.35rem 0.5rem;
             border-bottom: 1px solid var(--border-glass);
             border-right: 1px solid var(--border-glass);
             text-align: center;
             white-space: nowrap;
         }
 
-        /* Fixed column for House ID */
-        .matrix-table th:first-child, .matrix-table td:first-child {
+        /* Encabezados de tabla pegajosos verticalmente */
+        .matrix-table thead th {
             position: sticky;
-            left: 0;
-            z-index: 10;
-            background: var(--surface-card);
-            font-family: var(--font-display);
-            font-weight: 700;
-            border-right: 2px solid var(--border-glass);
-            text-align: left;
-        }
-
-        .matrix-table th {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--surface);
             color: var(--text-secondary);
             font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 9;
             font-size: 0.75rem;
             border-bottom: 2px solid var(--border-glass);
+            z-index: 10;
         }
 
-        .matrix-table th:first-child {
-            z-index: 11;
+        /* Primera fila del thead pegajosa en top: 0 */
+        .matrix-table thead tr:first-child th {
+            top: 0;
+            height: 28px;
+        }
+
+        /* Segunda fila del thead (meses) pegajosa en top: 28px */
+        .matrix-table thead tr:nth-child(2) th {
+            top: 28px;
+            height: 28px;
+        }
+
+        /* Columnas pegajosas horizontales */
+        .matrix-table .sticky-col-1 {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background: var(--surface);
+            font-family: var(--font-display);
+            font-weight: 700;
+            width: 70px;
+            min-width: 70px;
+            max-width: 70px;
+            text-align: center;
+        }
+
+        .matrix-table .sticky-col-2 {
+            position: sticky;
+            left: 70px;
+            z-index: 5;
+            background: var(--surface);
+            border-right: 2px solid var(--border-glass);
+            text-align: left;
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+        }
+
+        /* Intersecciones de encabezados (pegajosos tanto vertical como horizontalmente) */
+        .matrix-table thead th.sticky-col-1 {
+            z-index: 30;
+            left: 0;
+        }
+
+        .matrix-table thead th.sticky-col-2 {
+            z-index: 30;
+            left: 70px;
+        }
+
+        .matrix-cell-paid {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .matrix-cell-unpaid {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .matrix-square {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin: 0 auto;
+        }
+        .matrix-square.paid {
+            background-color: var(--success);
+        }
+        .matrix-square.unpaid {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .matrix-cell-paid {
@@ -631,7 +703,7 @@
         }
 
         th {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--surface);
             color: var(--text-secondary);
             font-weight: 600;
             padding: 1rem;
@@ -639,6 +711,9 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         td {
@@ -666,56 +741,121 @@
             font-weight: 600;
         }
 
-        /* Expenses view */
-        .expenses-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        /* Expenses Grid style */
+        .expenses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
         }
 
-        .expense-item {
-            background: rgba(255, 255, 255, 0.02);
+        .expense-card {
+            background: var(--surface-card);
             border: 1px solid var(--border-glass);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .expense-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(239, 68, 68, 0.25);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.05);
+        }
+
+        .expense-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--danger) 0%, rgba(239, 68, 68, 0.3) 100%);
+            opacity: 0.7;
+        }
+
+        .expense-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1.5rem;
-            transition: var(--transition);
         }
 
-        .expense-item:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.04);
-            transform: translateX(4px);
+        .expense-card-date {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        .expense-info {
+        .expense-card-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .expense-card-body {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.35rem;
+            flex-grow: 1;
         }
 
-        .expense-title {
-            font-weight: 600;
+        .expense-card-category {
+            font-family: var(--font-display);
             font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .expense-date {
-            font-size: 0.75rem;
+        .expense-card-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .expense-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 0.75rem;
+            margin-top: auto;
+        }
+
+        .expense-card-label {
+            font-size: 0.7rem;
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 0.5px;
         }
 
-        .expense-amount {
+        .expense-card-amount {
             font-family: var(--font-display);
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.35rem;
+            font-weight: 800;
             color: var(--danger);
-            white-space: nowrap;
+            line-height: 1;
         }
 
         /* Modal / Side Panel */
@@ -886,6 +1026,27 @@
             color: var(--text-muted);
             opacity: 0.25;
         }
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            transition: var(--transition);
+        }
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        body.light-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.05);
+            color: #0f172a;
+        }
     </style>
 </head>
 <body>
@@ -902,6 +1063,9 @@
                     <div class="sync-dot" id="sync-dot"></div>
                     <span id="sync-text">Conectando...</span>
                 </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar Tema">
+                    <i class="fa-solid fa-sun" id="theme-icon"></i>
+                </button>
             </div>
         </div>
         
@@ -910,10 +1074,7 @@
                 <i class="fa-solid fa-house"></i> Vista Casas
             </button>
             <button class="tab-btn" onclick="switchTab('matrix', this)">
-                <i class="fa-solid fa-table-cells"></i> Hoja de Cálculo
-            </button>
-            <button class="tab-btn" onclick="switchTab('control', this)">
-                <i class="fa-solid fa-list-check"></i> Tabla Resumen
+                <i class="fa-solid fa-table-cells"></i> Vista Tabla
             </button>
             <button class="tab-btn" onclick="switchTab('graficas', this)">
                 <i class="fa-solid fa-chart-pie"></i> Reportes Gráficos
@@ -1020,39 +1181,7 @@
             </div>
         </div>
 
-        <!-- Tab: Tabla Resumen -->
-        <div id="tab-control" class="tab-content">
-            <div class="filter-bar" style="border-top: none; padding-top: 0;">
-                <div class="filter-group">
-                    <span style="font-size: 0.9rem; color: var(--text-secondary); align-self: center;">
-                        Resumen general y aportación del portón eléctrico
-                    </span>
-                </div>
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="table-search" placeholder="Buscar en la tabla..." oninput="searchTable(this.value)">
-                </div>
-            </div>
-            
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Villa</th>
-                            <th>Residente</th>
-                            <th>Estatus</th>
-                            <th>Portón Eléctrico</th>
-                            <th>Controles</th>
-                            <th>Meses Registrados</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <!-- Javascript builds rows -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
 
         <!-- Tab: Reportes Gráficos -->
         <div id="tab-graficas" class="tab-content">
@@ -1089,8 +1218,21 @@
                     Historial Completo de Egresos
                     <span>Comité Villas de Pachuquilla 5</span>
                 </div>
-                <div class="expenses-list" id="expenses-list-container">
-                    <!-- Javascript builds expenses list -->
+                
+                <div class="filter-bar" style="border-top: none; padding-top: 0; margin-bottom: 1.5rem;">
+                    <div class="filter-group">
+                        <span style="font-size: 0.9rem; color: var(--text-secondary); align-self: center;">
+                            Registro detallado de gastos realizados por el comité
+                        </span>
+                    </div>
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="expenses-search" placeholder="Buscar egreso..." oninput="searchExpenses(this.value)">
+                    </div>
+                </div>
+                
+                <div class="expenses-grid" id="expenses-list-container">
+                    <!-- Javascript builds expenses cards -->
                 </div>
             </div>
         </div>
@@ -1140,8 +1282,8 @@
     <script>
         // Fallback local data (if offline)
         let COMITE_DATA = {
-          "balance": "$16,601.00",
-          "inputs": "$67,700.00",
+          "balance": "$16,501.00",
+          "inputs": "$67,600.00",
           "gastos": "$51,099.00",
           "transfer_from_previous": "",
           "months": [
@@ -2789,7 +2931,7 @@
                 "MARZO_2026": "$100.00",
                 "ABRIL_2026": "$100.00",
                 "MAYO_2026": "$100.00",
-                "JUNIO_2026": "$100.00",
+                "JUNIO_2026": "",
                 "JULIO_2026": "",
                 "AGOSTO_2026": "",
                 "SEPTIEMBRE_2026": "",
@@ -3066,34 +3208,94 @@
           ],
           "expenses": [
             {
+              "month": "MAYO",
+              "year": "2023",
+              "amount": "$550.00",
+              "description": "Poda de áreas comunes 20/05/2023"
+            },
+            {
+              "month": "JUNIO",
+              "year": "2023",
+              "amount": "$11,000.00",
+              "description": "01 - 02 - 24 Entrega de adelanto para el porton corredizo Vecina Karina"
+            },
+            {
+              "month": "JULIO",
+              "year": "2023",
+              "amount": "$12,700.00",
+              "description": "10 - 02 - 24 Pago final pago por pintura adelanto de pinturaDiscos para cortar el metal sobrante"
+            },
+            {
+              "month": "SEPTIEMBRE",
+              "year": "2023",
+              "amount": "$1,100.00",
+              "description": "pagado mano de obra y 100 mas por lijas, 22 de febrero"
+            },
+            {
+              "month": "OCTUBRE",
+              "year": "2023",
+              "amount": "$250.00",
+              "description": "Engrasante para porton"
+            },
+            {
+              "month": "NOVIEMBRE",
+              "year": "2023",
+              "amount": "$100.00",
+              "description": "Basura jardines septiembre 2024"
+            },
+            {
+              "month": "DICIEMBRE",
+              "year": "2023",
+              "amount": "$1,000.00",
+              "description": "Mtto. Prevento 14 de marzo e 2025"
+            },
+            {
+              "month": "ENERO",
+              "year": "2024",
+              "amount": "$4,700.00",
+              "description": "29 marzo adelanto para camaras"
+            },
+            {
+              "month": "FEBRERO",
+              "year": "2024",
+              "amount": "$1,300.00",
+              "description": "Corte del pasto por parte de la vecina casa 19 karina"
+            },
+            {
+              "month": "MARZO",
+              "year": "2024",
+              "amount": "$1,300.00",
+              "description": "Recogida del pasto que se corto"
+            },
+            {
               "month": "SEPTIMBRE",
               "year": "2025",
-              "amount": "corte de pasto",
-              "description": "$3,300.00"
+              "amount": "$3,300.00",
+              "description": "corte de pasto"
             },
             {
               "month": "DICIEMBRE",
               "year": "2025",
-              "amount": "Reparación de Porton soldadura 600 + cambio de tarjeta 1200",
-              "description": "$1,800.00"
+              "amount": "$1,800.00",
+              "description": "Reparación de Porton soldadura 600 + cambio de tarjeta 1200"
             },
             {
               "month": "MARZO",
               "year": "2026",
-              "amount": "Revisión y Cotización de PORTON (Se incluye si se contrata)",
-              "description": "$500.00"
+              "amount": "$500.00",
+              "description": "Revisión y Cotización de PORTON (Se incluye si se contrata)"
             },
             {
               "month": "MAYO",
               "year": "2026",
-              "amount": "Compra de motor, transferenciala vecino David 27 de mayo Banamex",
-              "description": "$10,099.00"
+              "amount": "$10,099.00",
+              "description": "Compra de motor, transferenciala vecino David 27 de mayo Banamex"
             },
             {
               "month": "JUNIO",
               "year": "2026",
-              "amount": "Pago de corte de pasto Jardinero Macedonio",
-              "description": "$1,400.00"
+              "amount": "$1,400.00",
+              "description": "Pago de corte de pasto Jardinero Macedonio"
             }
           ]
         };
@@ -3315,7 +3517,6 @@
                 const activeTab = activeTabBtn.getAttribute('onclick').match(/'([^']+)'/)[1];
                 if (activeTab === 'mapa') renderVillas('all');
                 else if (activeTab === 'matrix') renderMatrix();
-                else if (activeTab === 'control') renderTable();
             } else {
                 renderVillas('all');
             }
@@ -3336,8 +3537,6 @@
                 renderVillas('all');
             } else if (tabId === 'matrix') {
                 renderMatrix();
-            } else if (tabId === 'control') {
-                renderTable();
             }
         }
 
@@ -3434,7 +3633,7 @@
             const yearRow = document.createElement('tr');
             const monthRow = document.createElement('tr');
             
-            yearRow.innerHTML = '<th rowspan="2">Villa</th><th rowspan="2">Propietario / Residente</th><th rowspan="2">Estatus</th><th rowspan="2">Portón</th>';
+            yearRow.innerHTML = '<th class="sticky-col-1" rowspan="2">Villa</th><th class="sticky-col-2" rowspan="2">Propietario / Residente</th><th rowspan="2">Estatus</th><th rowspan="2">Portón</th>';
             
             let currentYear = "";
             let colSpan = 0;
@@ -3463,20 +3662,24 @@
             // Build body rows
             COMITE_DATA.houses.forEach(h => {
                 const row = document.createElement('tr');
-                let rowHtml = `<td>${h.id}</td><td>${h.resident || 'Desocupada'}</td><td>${h.status}</td><td>${h.gate_coop || '$0.00'}</td>`;
+                const residentName = h.resident || 'Desocupada';
+                let rowHtml = `<td class="sticky-col-1">${h.id}</td><td class="sticky-col-2"><div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${residentName}">${residentName}</div></td><td>${h.status}</td><td>${h.gate_coop || '$0.00'}</td>`;
                 
                 COMITE_DATA.months.forEach(m => {
                     const monthIdx = getMonthIndex(m.name);
                     if (m.year === '2023' && monthIdx < 4) {
-                        rowHtml += `<td class="matrix-cell-notapply">-</td>`;
+                        rowHtml += `<td><div class="matrix-square" style="visibility: hidden;"></div></td>`;
                         return;
                     }
                     
                     const payment = h.payments[`${m.name}_${m.year}`] || '';
-                    if (payment && payment.includes('100')) {
-                        rowHtml += `<td class="matrix-cell-paid">$100</td>`;
+                    let cleanPayment = payment.replace('$', '').replace(',', '').trim();
+                    if (cleanPayment && cleanPayment !== '0' && cleanPayment !== '0.00') {
+                        rowHtml += `<td><div class="matrix-square paid" title="Pagado: ${payment}"></div></td>`;
+                    } else if (h.status === 'En Obra Negra') {
+                        rowHtml += `<td><div class="matrix-square" style="visibility: hidden;"></div></td>`;
                     } else {
-                        rowHtml += `<td class="matrix-cell-empty">-</td>`;
+                        rowHtml += `<td><div class="matrix-square unpaid" title="No Pagado"></div></td>`;
                     }
                 });
                 
@@ -3498,62 +3701,66 @@
             });
         }
 
-        // Render Table General Resumen
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '';
-            
-            COMITE_DATA.houses.forEach(h => {
-                const monthsCount = getPaidMonthsCount(h);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="td-house">${h.id}</td>
-                    <td>${h.resident || '<em>N/A</em>'}</td>
-                    <td><span class="villa-badge" style="background: rgba(255,255,255,0.05); color: var(--text-primary);">${h.status}</span></td>
-                    <td class="td-amount">${h.gate_coop || '$0.00'}</td>
-                    <td style="text-align: center;">${h.controls || '0'}</td>
-                    <td style="text-align: center;">${monthsCount} meses</td>
-                    <td>
-                        <button class="filter-btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick='openModal(${JSON.stringify(h)})'>
-                            <i class="fa-solid fa-eye"></i> Historial
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function searchTable(query) {
-            const val = query.toLowerCase().trim();
-            const rows = document.querySelectorAll('#table-body tr');
-            rows.forEach(r => {
-                const text = r.innerText.toLowerCase();
-                if (text.includes(val)) {
-                    r.style.display = '';
-                } else {
-                    r.style.display = 'none';
-                }
-            });
-        }
-
         // Render Egresos
-        function renderExpenses() {
+        function renderExpenses(filterQuery = '') {
             const container = document.getElementById('expenses-list-container');
             container.innerHTML = '';
             
-            COMITE_DATA.expenses.forEach(e => {
-                const item = document.createElement('div');
-                item.className = 'expense-item';
-                item.innerHTML = `
-                    <div class="expense-info">
-                        <div class="expense-title">${e.description}</div>
-                        <div class="expense-date">${e.month} ${e.year}</div>
-                    </div>
-                    <div class="expense-amount">${e.amount}</div>
-                `;
-                container.appendChild(item);
+            const query = filterQuery.toLowerCase().trim();
+            const filteredExpenses = COMITE_DATA.expenses.filter(e => {
+                const desc = e.description.toLowerCase();
+                const date = `${e.month} ${e.year}`.toLowerCase();
+                const amt = e.amount.toLowerCase();
+                return desc.includes(query) || date.includes(query) || amt.includes(query);
             });
+
+            filteredExpenses.forEach(e => {
+                const card = document.createElement('div');
+                card.className = 'expense-card';
+                
+                // Clasificación automática de la descripción
+                let category = 'Gasto General';
+                let details = e.description;
+                
+                if (e.description.includes('|')) {
+                    const parts = e.description.split('|');
+                    category = parts[0].trim();
+                    details = parts.slice(1).join('|').trim();
+                } else if (e.description.toLowerCase().includes('luz')) {
+                    category = 'Servicio de Luz';
+                } else if (e.description.toLowerCase().includes('mantenimiento') || e.description.toLowerCase().includes('reparación')) {
+                    category = 'Mantenimiento';
+                }
+                
+                // Determinar icono según categoría
+                let iconClass = 'fa-file-invoice-dollar';
+                const catLower = category.toLowerCase();
+                if (catLower.includes('luz')) iconClass = 'fa-lightbulb';
+                else if (catLower.includes('mantenimiento') || catLower.includes('reparación') || catLower.includes('pintura')) iconClass = 'fa-wrench';
+                else if (catLower.includes('portón') || catLower.includes('control')) iconClass = 'fa-key';
+                else if (catLower.includes('papelería') || catLower.includes('impresión')) iconClass = 'fa-print';
+                else if (catLower.includes('limpieza')) iconClass = 'fa-broom';
+                
+                card.innerHTML = `
+                    <div class="expense-card-header">
+                        <span class="expense-card-date"><i class="fa-regular fa-calendar-days"></i> ${e.month} ${e.year}</span>
+                        <div class="expense-card-icon"><i class="fa-solid ${iconClass}"></i></div>
+                    </div>
+                    <div class="expense-card-body">
+                        <div class="expense-card-category">${category}</div>
+                        <div class="expense-card-details">${details}</div>
+                    </div>
+                    <div class="expense-card-footer">
+                        <span class="expense-card-label">Monto</span>
+                        <span class="expense-card-amount">${e.amount}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function searchExpenses(query) {
+            renderExpenses(query);
         }
 
         function getPaidMonthsCount(house) {
@@ -3634,6 +3841,20 @@
             });
 
             document.getElementById('villa-modal').style.display = 'flex';
+        }
+
+        // Initialize tabs handled by CSS active class
+        
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('theme-icon');
+            if (document.body.classList.contains('light-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
         }
 
         function closeModal() {
