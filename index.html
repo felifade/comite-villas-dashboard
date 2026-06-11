@@ -3589,9 +3589,15 @@
                 miniHistoryHtml += '</div>';
                 
                 const monthsCount = getPaidMonthsCount(h);
+                const gatePaid = h.gate_coop ? (parseFloat(h.gate_coop.replace('$', '').replace(',', '').trim()) || 0) : 0;
+                const totalPaid = (monthsCount * 100) + gatePaid;
+                const formattedTotal = '$' + totalPaid.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                
                 const monthsTextHtml = h.status === 'Habitada' 
                     ? `<div class="villa-months-text">${monthsCount} meses pagados</div>` 
                     : '';
+                
+                const abonoTextHtml = `<div class="villa-abono-text" style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.3rem;">Abonado: ${formattedTotal}</div>`;
                 
                 card.innerHTML = `
                     <div class="house-icon-container">
@@ -3600,6 +3606,7 @@
                     <div class="villa-id">${h.id}</div>
                     <div class="villa-owner">${h.resident || '<em>Desocupada</em>'}</div>
                     ${monthsTextHtml}
+                    ${abonoTextHtml}
                     <span class="villa-badge ${badgeClass}">${h.status}</span>
                     ${h.status === 'Habitada' ? miniHistoryHtml : ''}
                 `;
